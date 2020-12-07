@@ -2,13 +2,14 @@ import {Injectable} from '@angular/core';
 import {Post} from './post.model';
 import {HttpClient} from '@angular/common/http';
 import {map} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+import {Observable, Subject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PostsService {
   posts: Post[];
+  error = new Subject<string>();
 
   constructor(private httpClient: HttpClient) {
     this.posts = [];
@@ -19,6 +20,8 @@ export class PostsService {
     this.httpClient.post('https://ng-complete-guide-c9a62-default-rtdb.firebaseio.com/posts.json', postData)
       .subscribe(() => {
         this.posts.push(postData);
+      }, error => {
+        this.error.next(error.message);
       });
   }
 
