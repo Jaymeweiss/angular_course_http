@@ -11,7 +11,9 @@ export class AuthInterceptorService implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // do something before the request is sent
+    if (req.url !== 'some/wrong/url') {
+      // do something before the request is sent
+    }
     return next.handle(req);
   }
 }
