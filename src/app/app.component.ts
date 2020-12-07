@@ -35,16 +35,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.fetchPosts();
   }
 
-  private fetchPosts() {
-    this.isFetching = true;
-    this.postsService.fetchPosts().subscribe(posts => {
-      this.isFetching = false;
-      this.loadedPosts = posts;
-    }, error => {
-      this.error = error.message;
-    });
-  }
-
   onClearPosts() {
     this.postsService.deleteAllPosts().subscribe(() => {
       this.loadedPosts = [];
@@ -53,5 +43,21 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.errorSubscription.unsubscribe();
+  }
+
+  dismissError() {
+    this.isFetching = false;
+    this.error = null;
+  }
+
+  private fetchPosts() {
+    this.isFetching = true;
+    this.postsService.fetchPosts().subscribe(posts => {
+      this.isFetching = false;
+      this.loadedPosts = posts;
+    }, error => {
+      this.isFetching = false;
+      this.error = error.message;
+    });
   }
 }
