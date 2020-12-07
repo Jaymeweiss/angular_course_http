@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Post} from './post.model';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {catchError, map} from 'rxjs/operators';
 import {Observable, Subject, throwError} from 'rxjs';
 
@@ -26,7 +26,14 @@ export class PostsService {
   }
 
   fetchPosts(): Observable<any> {
-    return this.httpClient.get('https://ng-complete-guide-c9a62-default-rtdb.firebaseio.com/posts.json')
+    let searchParams = new HttpParams();
+    searchParams = searchParams.append('print', 'pretty');
+    searchParams = searchParams.append('foo', 'bar');
+    return this.httpClient.get('https://ng-complete-guide-c9a62-default-rtdb.firebaseio.com/posts.json',
+      {
+        headers: new HttpHeaders({ 'Custom-Header': 'Hello' }),
+        params: searchParams
+      })
       .pipe(map((responseData: { [key: string]: Post }) => {
           const postArray: Post[] = [];
           for (const key in responseData) {
