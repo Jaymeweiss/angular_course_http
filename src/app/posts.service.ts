@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Post} from './post.model';
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {catchError, map} from 'rxjs/operators';
+import {HttpClient, HttpEventType, HttpHeaders, HttpParams} from '@angular/common/http';
+import {catchError, map, tap} from 'rxjs/operators';
 import {Observable, Subject, throwError} from 'rxjs';
 
 @Injectable({
@@ -17,7 +17,12 @@ export class PostsService {
 
   storePost(title: string, content: string): void {
     const postData: Post = {title, content};
-    this.httpClient.post('https://ng-complete-guide-c9a62-default-rtdb.firebaseio.com/posts.json', postData)
+    this.httpClient.post('https://ng-complete-guide-c9a62-default-rtdb.firebaseio.com/posts.json',
+      postData,
+      {
+        observe: 'response'
+      }
+    )
       .subscribe(() => {
         this.posts.push(postData);
       }, error => {
@@ -31,7 +36,7 @@ export class PostsService {
     searchParams = searchParams.append('foo', 'bar');
     return this.httpClient.get('https://ng-complete-guide-c9a62-default-rtdb.firebaseio.com/posts.json',
       {
-        headers: new HttpHeaders({ 'Custom-Header': 'Hello' }),
+        headers: new HttpHeaders({'Custom-Header': 'Hello'}),
         params: searchParams
       })
       .pipe(map((responseData: { [key: string]: Post }) => {
@@ -52,6 +57,15 @@ export class PostsService {
   }
 
   deleteAllPosts(): Observable<any> {
-    return this.httpClient.delete('https://ng-complete-guide-c9a62-default-rtdb.firebaseio.com/posts.json');
+    return this.httpClient.delete('https://ng-complete-guide-c9a62-default-rtdb.firebaseio.com/posts.json', {
+      observe: 'events',
+      responseType: 'json' // blob, text etc.
+    })
+      .pipe(tap(event => {
+        console.log(event);
+        if (event.type === HttpEventType.Response) {
+          console.log(event.body);
+        }
+      }));
   }
 }
