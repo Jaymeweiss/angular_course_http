@@ -10,6 +10,7 @@ import {Post} from './post.model';
 })
 export class AppComponent implements OnInit {
   loadedPosts: Post[] = [];
+  isFetching = false;
 
   constructor(private httpClient: HttpClient) {
   }
@@ -36,6 +37,7 @@ export class AppComponent implements OnInit {
   }
 
   private fetchPosts(): void {
+    this.isFetching = true;
     this.httpClient.get('https://ng-complete-guide-c9a62-default-rtdb.firebaseio.com/posts.json')
       .pipe(map((responseData: { [key: string]: Post }) => {
         const postArray: Post[] = [];
@@ -47,6 +49,7 @@ export class AppComponent implements OnInit {
         return postArray;
       }))
       .subscribe((posts) => {
+        this.isFetching = false;
         this.loadedPosts = posts;
       });
   }
