@@ -11,9 +11,11 @@ export class AuthInterceptorService implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    let modifiedRequest = req.clone();
     if (req.url !== 'some/wrong/url') {
       // do something before the request is sent
+      modifiedRequest = req.clone({headers: req.headers.append('Auth', 'xyz')});
     }
-    return next.handle(req);
+    return next.handle(modifiedRequest);
   }
 }
